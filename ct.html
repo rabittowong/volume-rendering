@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>COMP5411 Assignment: Volume Rendering</title>
+		<meta charset = "UTF-8">
+		<script id="vertex_shader" type="x-shader/x-vertex">
+			varying vec2 texCoord;
+			uniform float layerPos;
+
+			void main() {
+				// this matrix allows the mesh to "stand" in the scene
+				mat4 rotationMatrix = mat4(
+					1.0,  0.0, 0.0, 0.0,
+					0.0,  0.0, 1.0, 0.0,
+					0.0, -1.0, 0.0, 0.0,
+					0.0,  0.0, 0.0, 1.0
+				);
+
+				// this matrix moves the mesh to the central of the camera
+				mat4 transitionMatrix = mat4(
+					1.0, 0.0, 0.0, 0.0,
+					0.0, 1.0, 0.0, 0.0,
+					0.0, 0.0, 1.0, 0.0,
+					0.0, 0.0, layerPos - 0.5, 1.0
+				);
+
+				texCoord = uv;
+				gl_Position = projectionMatrix * modelViewMatrix * rotationMatrix * transitionMatrix * vec4(position, 1.0);
+			}
+		</script>
+		<script id="fragment_shader" type="x-shader/x-fragment">
+			precision mediump float;
+			varying vec2 texCoord;
+			uniform sampler2D texture;
+
+			void main() {
+				gl_FragColor = texture2D(texture, texCoord);
+
+				// set the alpha value of each pixel be its relative luminance
+				gl_FragColor.a = 0.2126 * gl_FragColor.r + 0.7152 * gl_FragColor.g + 0.0722 * gl_FragColor.b;
+			}
+		</script>
+		<script src="js/three.min.js"></script>
+		<script src="js/OrbitControls.js"></script>
+	</head>
+	<body style="font-family: Sans-serif; background-color: #FFFFDF">
+		<h3>
+			HKUST COMP5411<br>
+			Assignment: Rendering using shaders<br>
+			Topic: Volume rendering
+		</h3>
+		<script>
+			// define the source file and frame number
+			var source = "ct";
+			var frameNumber = 99;
+
+			// create a new scene and perspective camera
+			var scene = new THREE.Scene();
+			var camera = new THREE.PerspectiveCamera(60, 1, 0.1, 99);
+			camera.position.z = -1.5;
+
+			// create a WebGL renderer
+			var renderer = new THREE.WebGLRenderer();
+			renderer.setSize(512, 512);
+			renderer.setClearColor(0x000000, 1);
+			document.body.appendChild(renderer.domElement);
+
+			// allow the camera to move orbitally
+			var orbit = new THREE.OrbitControls(camera, renderer.domElement);
+			orbit.enableZoom = true;
+
+			// add all the planes to the scene
+			for (var i = 0; i < frameNumber; i++) {
+				var geometry = new THREE.PlaneGeometry(1, 1);
+
+				var texture = THREE.ImageUtils.loadTexture(source + "/" + (frameNumber - i) + ".gif");
+				texture.anisotropy = renderer.getMaxAnisotropy();
+				var layerPos = 1.0 - i / frameNumber;
+
+				var material = new THREE.ShaderMaterial({
+					transparent: true,
+					depthTest: false,
+					side: THREE.DoubleSide,
+					uniforms: {
+						texture: {type: "t", value: texture},
+						layerPos: {type: "f", value: layerPos}
+					},
+					vertexShader: document.getElementById("vertex_shader").textContent,
+					fragmentShader: document.getElementById("fragment_shader").textContent
+				});
+
+				var plane = new THREE.Mesh(geometry, material);
+				scene.add(plane);
+			}
+
+			// render the canvas in the explorer
+			var render = function() {
+				requestAnimationFrame(render);
+				renderer.render(scene, camera);
+			};
+			render();
+		</script>
+		<div id="content" style="position: relative; top: 15px">
+			Choose mesh to be shown in the canvas:
+			<select>
+				<option onclick="location.href='cone.html'">Cone</option>
+				<option onclick="location.href='cube.html'">Cube</option>
+				<option onclick="location.href='cylinder.html'">Cylinder</option>
+				<option onclick="location.href='pyramid.html'">Pyramid</option>
+				<option onclick="location.href='sphere.html'">Sphere</option>
+				<option onclick="location.href='ct.html'">CT</option>
+				<option onclick="location.href='mri.html'">MRI</option>
+			</select>
+			<br>
+			Below are the raw files (in gif format):<br>
+			<br>
+			<div id="box"></div><br>
+		</div>
+		<script>
+			function loadImage() {
+				var text = "";
+				for (var i = 0; i < frameNumber; i++) {
+					text = text + '<img src="' + source + '/' + (i + 1) + '.gif" width="99"> ';
+				}
+				document.getElementById("box").innerHTML = text;
+			}
+			loadImage();
+		</script>
+	</body>
+</html>
