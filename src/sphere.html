@@ -51,8 +51,8 @@
 		</h3>
 		<script>
 			// define the source file and frame number
-			var source = "mri";
-			var frameNumber = 99;
+			var source = "sphere";
+			var frameNumber = 50;
 
 			// create a new scene and perspective camera
 			var scene = new THREE.Scene();
@@ -73,7 +73,7 @@
 			for (var i = 0; i < frameNumber; i++) {
 				var geometry = new THREE.PlaneGeometry(1, 1);
 
-				var texture = THREE.ImageUtils.loadTexture(source + "/" + (frameNumber - i) + ".gif");
+				var texture = THREE.ImageUtils.loadTexture("img/" + source + "/" + (frameNumber - i) + ".gif");
 				texture.anisotropy = renderer.getMaxAnisotropy();
 				var layerPos = 1.0 - i / frameNumber;
 
@@ -107,7 +107,7 @@
 				<option onclick="location.href='cube.html'">Cube</option>
 				<option onclick="location.href='cylinder.html'">Cylinder</option>
 				<option onclick="location.href='pyramid.html'">Pyramid</option>
-				<option onclick="location.href='sphere.html'">Sphere</option>
+				<option onclick="location.href='sphere.html'" selected>Sphere</option>
 				<option onclick="location.href='ct.html'">CT</option>
 				<option onclick="location.href='mri.html'">MRI</option>
 			</select>
@@ -120,7 +120,7 @@
 			function loadImage() {
 				var text = "";
 				for (var i = 0; i < frameNumber; i++) {
-					text = text + '<img src="' + source + '/' + (i + 1) + '.gif" width="99"> ';
+					text = text + '<img src="img/' + source + '/' + (i + 1) + '.gif" width="99"> ';
 				}
 				document.getElementById("box").innerHTML = text;
 			}

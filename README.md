@@ -1,3 +1,3 @@
-# Comp5411 Project
+# Volume rendering
 
-Demo of volumn rendering.
+Demo of volume rendering.
