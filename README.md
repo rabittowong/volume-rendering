@@ -6,8 +6,8 @@ This Node.js application is designed to render a 3D object based on a set of cut
 
 ## Features
 
-- **3D Object Rendering**: The application processes a set of cut-away view images and uses THREE.js to render the corresponding 3D object
-- **Three.js Integration**: Utilizes the powerful THREE.js library for rendering 3D graphics and displaying them in a web-based environment
+- **3D Object Rendering**: The application processes a set of cut-away view images and uses Three.js to render the corresponding 3D object
+- **Three.js Integration**: Utilizes the powerful Three.js library for rendering 3D graphics and displaying them in a web-based environment
 
 ## Installation
 
